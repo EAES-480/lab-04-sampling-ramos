@@ -15,7 +15,7 @@ editor_options:
   chunk_output_type: inline
 ---
 
-```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+```{r setup, echo=FALSE, message=FALSE, warning=T}
 library(tidyverse)
 library(lubridate)
 library(janitor)
@@ -58,7 +58,7 @@ By the end of this lab, you should be able to:
 
 ## Load and inspect
 
-```{r load_data, echo=TRUE, eval=FALSE}
+```{r load_data, echo=TRUE, eval=T}
 df <- read_csv("data/us-ams-simple.csv") %>%
   clean_names() %>% filter(year_local == 2023)
 
@@ -73,15 +73,15 @@ glimpse(df)
 
 This dataset uses **Year + Day-of-Year (DOY)**. Month must be derived from a calendar date.
 
-```{r derive_time, echo=TRUE, eval=FALSE}
+```{r derive_time, echo=TRUE, eval=T}
 df <- df %>%
   mutate(
     # TODO: create a Date column from year_local and doy
     # HINT: Jan 1 is DOY = 1, so use (doy - 1) with origin = "YYYY-01-01"
-    date = as.Date(___ - 1, origin = paste0(___, "-01-01")),
+    date = as.Date(doy - 1, origin = paste0(year_local, "-01-01")),
 
     # TODO: create a month column (numeric 1–12 or labeled months)
-    month = month(___, label = TRUE, abbr = TRUE),
+    month = month(date, label = TRUE, abbr = TRUE),
 
     # TODO: make a day/night label using daytime (0/1)
     day_night = if_else(daytime == 1, "Day", "Night")
@@ -104,7 +104,7 @@ Examples you can choose from (depending on what you see in the dataset):
 
 ```{r choose_response, echo=TRUE, eval=FALSE}
 # TODO: choose ONE response variable (a column name as a string)
-response_var <- "gpp"   # replace "gpp" with your choice, e.g. "fc" or "le" or "ta"
+response_var <- "le"   # replace "gpp" with your choice, e.g. "fc" or "le" or "ta"
 
 # CHECK: print a quick summary
 df %>% summarise(
