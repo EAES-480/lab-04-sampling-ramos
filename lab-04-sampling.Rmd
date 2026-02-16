@@ -59,7 +59,8 @@ By the end of this lab, you should be able to:
 ## Load and inspect
 
 ```{r load_data, echo=TRUE, eval=T}
-df <- read_csv("data/us-ams-simple.csv") %>%
+df <- read_csv("data/us-ams-simple.csv",
+               na = c("-9999")) %>%
   clean_names() %>% filter(year_local == 2023)
 
 glimpse(df)
@@ -75,6 +76,7 @@ This dataset uses **Year + Day-of-Year (DOY)**. Month must be derived from a cal
 
 ```{r derive_time, echo=TRUE, eval=T}
 df <- df %>%
+  filter(!is.na(daytime)) %>%
   mutate(
     # TODO: create a Date column from year_local and doy
     # HINT: Jan 1 is DOY = 1, so use (doy - 1) with origin = "YYYY-01-01"
@@ -102,16 +104,16 @@ Examples you can choose from (depending on what you see in the dataset):
 - Energy: `le`
 - Meteorology: `ta`, `ts`, `swc`
 
-```{r choose_response, echo=TRUE, eval=FALSE}
+```{r choose_response, echo=TRUE, eval=T}
 # TODO: choose ONE response variable (a column name as a string)
 response_var <- "le"   # replace "gpp" with your choice, e.g. "fc" or "le" or "ta"
 
 # CHECK: print a quick summary
 df %>% summarise(
   n = n(),
-  n_missing = sum(is.na(____)),
-  mean = mean(____, na.rm = TRUE),
-  sd = sd(____, na.rm = TRUE)
+  n_missing = sum(is.na(df[[response_var]])),
+  mean = mean(df[[response_var]], na.rm = TRUE),
+  sd = sd(df[[response_var]], na.rm = TRUE)
 )
 ```
 
@@ -149,7 +151,7 @@ Remember: for this lab, the **population** is the entire 2023 half-hourly time s
 # TODO: pick a y aesthetic using response_var.
 
 df %>%
-  ggplot(aes(x = date, y = ____)) +
+  ggplot(aes(x = date, y = df[[response_var]])) +
   geom_line(alpha = 0.25) +
   theme_classic(base_size = 18) +
   labs(
@@ -167,16 +169,16 @@ df %>%
 
 ## 2.2 Population distribution (histogram + density)
 
-```{r pop_distribution, echo=TRUE, eval=FALSE}
+```{r pop_distribution, echo=TRUE, eval=T}
 # GOAL: See the overall distribution of the population.
 # TODO: choose an appropriate number of bins (start with ~50).
 
-ggplot(df, aes(x = ____)) +
-  geom_histogram(bins = ___, alpha = 0.7) +
+ggplot(df, aes(x = df[[response_var]])) +
+  geom_histogram(bins = 50, alpha = 0.7) +
   theme_classic(base_size = 18) +
   labs(x = response_var, y = "Count", title = "Population distribution (histogram)")
 
-ggplot(df, aes(x = ____)) +
+ggplot(df, aes(x = df[[response_var]])) +
   geom_density(alpha = 0.7) +
   theme_classic(base_size = 18) +
   labs(x = response_var, y = "Density", title = "Population distribution (density)")
@@ -192,10 +194,10 @@ ggplot(df, aes(x = ____)) +
 
 ### By month
 
-```{r pop_by_month, echo=TRUE, eval=FALSE}
+```{r pop_by_month, echo=TRUE, eval=T}
 # TODO: make month appear in a sensible order (it already is an ordered factor if label=TRUE)
 df %>%
-  ggplot(aes(x = month, y = ____)) +
+  ggplot(aes(x = month, y = df[[response_var]])) +
   geom_boxplot(outlier.alpha = 0.25) +
   theme_classic(base_size = 18) +
   labs(x = NULL, y = response_var, title = "Population by month")
@@ -203,9 +205,9 @@ df %>%
 
 ### By day/night
 
-```{r pop_by_daynight, echo=TRUE, eval=FALSE}
+```{r pop_by_daynight, echo=TRUE, eval=T}
 df %>%
-  ggplot(aes(x = day_night, y = ____)) +
+  ggplot(aes(x = day_night, y = df[[response_var]])) +
   geom_boxplot(outlier.alpha = 0.25) +
   theme_classic(base_size = 18) +
   labs(x = NULL, y = response_var, title = "Population by day vs night")
@@ -222,8 +224,8 @@ df %>%
 Compute the population mean and SD for your chosen response variable.
 
 ```{r population_params, echo=TRUE, eval=FALSE}
-pop_mean <- mean(df____, na.rm = TRUE)
-pop_sd   <- sd(df____, na.rm = TRUE)
+pop_mean <- mean(df[[response_var]], na.rm = TRUE)
+pop_sd   <- sd(df[[response_var]], na.rm = TRUE)
 
 tibble(
   response_var = response_var,
@@ -242,13 +244,13 @@ tibble(
 set.seed(480)
 
 # TODO: choose a sample size (e.g., 200, 500, 1000)
-n_samp <- ___
+n_samp <- 1000
 
 samp <- df %>%
   slice_sample(n = n_samp)
 
-samp_mean <- mean(samp____, na.rm = TRUE)
-samp_sd   <- sd(samp____, na.rm = TRUE)
+samp_mean <- mean(samp[[response_var]], na.rm = TRUE)
+samp_sd   <- sd(samp[[response_var]], na.rm = TRUE)
 
 tibble(
   n_samp = n_samp,
@@ -270,13 +272,13 @@ tibble(
 ```{r sampling_distribution, echo=TRUE, eval=FALSE}
 set.seed(480)
 
-reps <- ___   # TODO: choose number of replicates (e.g., 500 or 1000)
+reps <- 1000   # TODO: choose number of replicates (e.g., 500 or 1000)
 
 means <- replicate(
   reps,
   df %>%
     slice_sample(n = n_samp) %>%
-    summarise(m = mean(____, na.rm = TRUE)) %>%
+    summarise(m = mean(le, na.rm = TRUE)) %>%
     pull(m)
 )
 
@@ -309,15 +311,15 @@ set.seed(480)
 
 # GOAL: sample within each month to ensure seasonal representation.
 # TODO: choose n_per_month so total sample size is reasonable (e.g., 12 * 20 = 240)
-n_per_month <- ___
+n_per_month <- 1200
 
 samp_strat <- df %>%
   group_by(month) %>%
   slice_sample(n = n_per_month) %>%
   ungroup()
 
-strat_mean <- mean(samp_strat____, na.rm = TRUE)
-strat_sd   <- sd(samp_strat____, na.rm = TRUE)
+strat_mean <- mean(samp_strat[[response_var]], na.rm = TRUE)
+strat_sd   <- sd(samp_strat[[response_var]], na.rm = TRUE)
 
 tibble(
   n_per_month = n_per_month,
