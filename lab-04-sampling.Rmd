@@ -223,7 +223,7 @@ df %>%
 
 Compute the population mean and SD for your chosen response variable.
 
-```{r population_params, echo=TRUE, eval=FALSE}
+```{r population_params, echo=TRUE, eval=T}
 pop_mean <- mean(df[[response_var]], na.rm = TRUE)
 pop_sd   <- sd(df[[response_var]], na.rm = TRUE)
 
@@ -240,7 +240,7 @@ tibble(
 
 ## 4.1 One random sample
 
-```{r one_sample, echo=TRUE, eval=FALSE}
+```{r one_sample, echo=TRUE, eval=T}
 set.seed(480)
 
 # TODO: choose a sample size (e.g., 200, 500, 1000)
@@ -269,7 +269,7 @@ tibble(
 
 ## 4.2 Sampling variability: many samples → many means
 
-```{r sampling_distribution, echo=TRUE, eval=FALSE}
+```{r sampling_distribution, echo=TRUE, eval=T}
 set.seed(480)
 
 reps <- 1000   # TODO: choose number of replicates (e.g., 500 or 1000)
@@ -306,7 +306,7 @@ Here you’ll test whether stratification helps when the population has structur
 
 ## 5.1 Stratify by month
 
-```{r strat_by_month, echo=TRUE, eval=FALSE}
+```{r strat_by_month, echo=TRUE, eval=T}
 set.seed(480)
 
 # GOAL: sample within each month to ensure seasonal representation.
@@ -335,7 +335,7 @@ tibble(
 
 ## 5.2 Compare strategies (SRS vs stratified)
 
-```{r compare_sampling, echo=TRUE, eval=FALSE}
+```{r compare_sampling, echo=TRUE, eval=T}
 tibble(
   strategy = c("Population", "SRS", "Stratified by month"),
   mean = c(pop_mean, samp_mean, strat_mean),
@@ -389,10 +389,10 @@ All exercises below should run using the same objects from Part I:
 
 **Risk:** if the variable has strong cycles aligned with the interval, systematic sampling can be biased.
 
-```{r systematic_sampling, echo=TRUE, eval=FALSE}
+```{r systematic_sampling, echo=TRUE, eval=T}
 # GOAL: Create a systematic sample and compare mean/sd to population.
 # TODO: choose an interval k (try 48, 24, 96).
-k <- ___
+k <- 24
 
 sys_samp <- df %>%
   # TODO: keep only non-missing response values
@@ -413,7 +413,7 @@ tibble(
 **Prompt (3–4 sentences):** Did systematic sampling approximate the population mean/SD better or worse than SRS?  
 What cycle (daily or seasonal) might be interacting with your chosen `k`?
 
-> *Write your answer here.*
+> *Write your answer here. No*
 
 ---
 
@@ -423,12 +423,12 @@ What cycle (daily or seasonal) might be interacting with your chosen `k`?
 
 This mimics EAES logistics: you may only be able to sample on certain days.
 
-```{r cluster_sampling_days, echo=TRUE, eval=FALSE}
+```{r cluster_sampling_days, echo=TRUE, eval=T}
 # GOAL: Sample whole days as clusters, then estimate mean/sd.
 # TODO: choose number of days to sample.
 set.seed(480)
 
-n_days <- ___
+n_days <- 90
 
 days <- df %>%
   distinct(date) %>%
@@ -468,7 +468,7 @@ This mimics continuous instrumentation that logs at a lower frequency (e.g., hou
 ```{r quasi_continuous, echo=TRUE, eval=FALSE}
 # GOAL: Create a regular subsampled time series.
 # TODO: choose a step size (every 2 records = hourly; every 4 = 2-hourly).
-step <- ___
+step <- 2
 
 qc_samp <- df %>%
   filter(!is.na(.data[[response_var]])) %>%
@@ -492,14 +492,14 @@ tibble(
 # HINT: filter to one month to avoid overplotting.
 
 df %>%
-  filter(month == ___) %>%   # e.g., "Jul" if month is labeled
+  filter(month == "Jan") %>%   # e.g., "Jul" if month is labeled
   ggplot(aes(x = date, y = .data[[response_var]])) +
   geom_line(alpha = 0.25) +
   theme_classic(base_size = 18) +
   labs(title = "Population time series (subset)", x = NULL, y = response_var)
 
 qc_samp %>%
-  filter(month == ___) %>%
+  filter(month == "Jan") %>%
   ggplot(aes(x = date, y = .data[[response_var]])) +
   geom_line(alpha = 0.6) +
   theme_classic(base_size = 18) +
@@ -515,7 +515,7 @@ In an EAES context, when is quasi-continuous sampling preferable to sparse discr
 
 ## Exercise 4 — Compare all strategies in one table (and interpret)
 
-```{r compare_all, echo=TRUE, eval=FALSE}
+```{r compare_all, echo=TRUE, eval=T}
 # GOAL: Assemble a comparison table of mean/sd error for each strategy.
 # NOTE: This assumes you created objects: samp, samp_strat, sys_samp, cluster_samp, qc_samp.
 # If your object names differ, update them here.
