@@ -132,11 +132,11 @@ Fill in at least **5 variables** from this dataset:
 
 | Variable | Units | Description | Expected sign/seasonality? |
 |----------|-------|-------------|----------------------------|
-|          |       |             |                            |
-|          |       |             |                            |
-|          |       |             |                            |
-|          |       |             |                            |
-|          |       |             |                            |
+|     DO     |   µmol L-1    |      Dissolved oxygen in water       |         Peaks in winter, lowest in summer.                   |
+|     PCH4     |    nmolCH4 mol-1   |     Dissolved methane (CH4) in water        |         Peaks in summer/early fall, lowest in winter.                   |
+|    PA      |   kPa    |       Atmospheric pressure      |              Generally higher in winter, lower in summer.              |
+|    D_SNOW      |     	cm  |      Snow depth       |            Peaks in winter/early spring, zero in summer.                |
+|     P     |    mm   |      Precipitation       |              Highly region-dependent.              |
 
 ---
 
@@ -163,7 +163,7 @@ df %>%
 
 **Prompt (2–3 sentences):** What major patterns do you see? (Seasonal cycle? Daily cycle? Outliers?)
 
-> *Write your answer here.*
+> *Summer shows high peaks, while winter has near 0 latent heat flux. There are also day and night cycles with no visible outliers.*
 
 ---
 
@@ -186,7 +186,7 @@ ggplot(df, aes(x = df[[response_var]])) +
 
 **Prompt:** Describe shape (skew, modality), center, and spread.
 
-> *Write your answer here.*
+> *The distribution is unimodal with a right skew, the center is around 10 with a extensive spread.*
 
 ---
 
@@ -215,7 +215,7 @@ df %>%
 
 **Prompt (3–4 sentences):** Which grouping variable (month or day/night) seems to explain more variability in your response? Why?
 
-> *Write your answer here.*
+> *Day/night seems to explain more variability because latent heat flux is primarily driven by solar radiation, the nighttime values are tightly clustered near zero with very little spread, regardless of the time of year.*
 
 ---
 
@@ -263,7 +263,7 @@ tibble(
 
 **Prompt (2–3 sentences):** How close is your one-sample estimate to the population mean/SD? Is the difference surprising?
 
-> *Write your answer here.*
+> *The one-sample estimates are very close to the true population parameters, the difference is not surprising because of the large numbers law.*
 
 ---
 
@@ -296,7 +296,7 @@ ggplot(tibble(mean_est = means), aes(mean_est)) +
 
 **Prompt (2–3 sentences):** Is the sampling distribution centered on the population mean? What happens if you increase `n_samp`?
 
-> *Write your answer here.*
+> *Yes, it is centered. Increasing n_samp will reduce the distribution spreading.*
 
 ---
 
@@ -345,7 +345,7 @@ tibble(
 
 **Prompt (3–4 sentences):** Which strategy better approximated the population mean and SD for your response variable? Why might stratification help (or not) here?
 
-> *Write your answer here.*
+> *Stratified by month has a better approximation compared to SRS. By stratifying by month, that forced the sample to proportionally represent every part of the year, guaranteeing that both the summer months and winter months are accurately captured.*
 
 ---
 
@@ -413,7 +413,7 @@ tibble(
 **Prompt (3–4 sentences):** Did systematic sampling approximate the population mean/SD better or worse than SRS?  
 What cycle (daily or seasonal) might be interacting with your chosen `k`?
 
-> *Write your answer here. No*
+> *Systematic sampling is approximating worse than SRS, because k is interacting with daily periodicity.*
 
 ---
 
@@ -455,7 +455,7 @@ tibble(
 **Prompt (3–4 sentences):** Why might cluster sampling have **higher variance** than SRS for the same number of measurements?  
 What feature of time series data (hint: autocorrelation) is relevant here?
 
-> *Write your answer here.*
+> *Because the observations within a given cluster are not independent (high correlation). Measurements taken close together exhibit strong autocorrelation.*
 
 ---
 
@@ -465,7 +465,7 @@ What feature of time series data (hint: autocorrelation) is relevant here?
 
 This mimics continuous instrumentation that logs at a lower frequency (e.g., hourly instead of 30-min).
 
-```{r quasi_continuous, echo=TRUE, eval=FALSE}
+```{r quasi_continuous, echo=TRUE, eval=T}
 # GOAL: Create a regular subsampled time series.
 # TODO: choose a step size (every 2 records = hourly; every 4 = 2-hourly).
 step <- 2
@@ -487,7 +487,7 @@ tibble(
 
 ### Visual check: does the subsampled series preserve structure?
 
-```{r qc_plot, echo=TRUE, eval=FALSE}
+```{r qc_plot, echo=TRUE, eval=T}
 # TODO: plot BOTH population and qc_samp time series (thin lines) for a short window
 # HINT: filter to one month to avoid overplotting.
 
@@ -509,7 +509,7 @@ qc_samp %>%
 **Prompt (3–4 sentences):** Does quasi-continuous sampling preserve the **seasonal** pattern? The **daily** pattern?  
 In an EAES context, when is quasi-continuous sampling preferable to sparse discrete sampling?
 
-> *Write your answer here.*
+> *Yes, quasi-continuous sampling preserve the daily pattern and not the seasonal pattern. Quasi-continuous sampling is preferable when measuring variables driven by short-term cycles*
 
 ---
 
@@ -547,7 +547,7 @@ bind_rows(
 Explain *why* in terms of (i) seasonal/diurnal structure and (ii) dependence/autocorrelation.  
 If you were designing a real EAES study with limited field days, what hybrid strategy would you propose (e.g., stratified + clustered)?
 
-> *Write your answer here.*
+> *Stratified sampling by month provided the best estimates for both the population mean and SD. This strategy is better because it accounts for the strong seasonal pattern. Furthermore, by randomly selecting observations within those monthly strata, it mitigates the negative impacts of temporal autocorrelation. Systematic sampling performed the worst because its fixed interval likely aliased with the daily cycle. For a real field study with limited resources, I would propose a stratified-cluster hybrid design.*
 
 ---
 
